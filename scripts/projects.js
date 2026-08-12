@@ -4,7 +4,7 @@ const projects = [
     {
         title: "IsOnline",
         description: "Настольная ролевая игра про MMORPG в смешанной реальности",
-        url: "https://isonline.yevwke.ru/"
+        url: "https://yevwke.github.io/isonline/"
     },
     {
         title: "Azar Map",
