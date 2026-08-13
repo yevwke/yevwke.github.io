@@ -133,14 +133,6 @@ body {
     transition: width 0.35s ease;
 }
 
-.socials a:hover {
-    color: #1b1a1a;
-}
-
-.socials a:hover::after {
-    width: 100%;
-}
-
 .support-link {
     margin-top: 40px;
 }
@@ -165,14 +157,6 @@ body {
     transition: width 0.35s ease;
 }
 
-.support-link a:hover {
-    color: var(--text);
-}
-
-.support-link a:hover::after {
-    width: 100%;
-}
-
 .projects-section {
     margin-top: 52px;
 }
@@ -191,8 +175,8 @@ body {
     .page {
         width: calc(100% - 32px);
         margin: 0 auto;
-        padding-top: 80px;
-        padding-bottom: 40px;
+        padding-top: 60px;
+        padding-bottom: 10px;
     }
 
     .logo {
@@ -201,6 +185,24 @@ body {
 
     .projects-section {
         margin-top: 45px;
+    }
+}
+
+@media (hover: hover) {
+    .socials a:hover {
+        color: #1b1a1a;
+    }
+
+    .socials a:hover::after {
+        width: 100%;
+    }
+
+    .support-link a:hover {
+        color: var(--text);
+    }
+
+    .support-link a:hover::after {
+        width: 100%;
     }
 }
 

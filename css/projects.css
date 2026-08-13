@@ -30,14 +30,16 @@
     transition: transform 0.2s ease;
 }
 
-.project-link:hover {
-    color: #ffffff;
-    /* background-color: rgba(255, 255, 255, 0.025); */
-}
+@media (hover: hover) {
+    .project-link:hover {
+        color: #ffffff;
+        /* background-color: rgba(255, 255, 255, 0.025); */
+    }
 
-.project-link:hover::before {
-    transform: scaleY(1);
-    background: #33d6ad;
+    .project-link:hover::before {
+        transform: scaleY(1);
+        background: #33d6ad;
+    }
 }
 
 .project-title {
