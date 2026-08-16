@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <title>404 — Страница не найдена | yevwke</title>
+    <link rel="icon" type="image/png" href="./image/icon.png">
+    <link rel="stylesheet" href="./general.css">
+    <style>
+        .error-code {
+            margin-top: 70px;
+            font-family: var(--font-logo);
+            font-size: 64px;
+            font-weight: 700;
+            line-height: 1;
+            letter-spacing: -0.04em;
+            color: var(--text);
+        }
+
+        .error-text {
+            margin-top: 12px;
+            color: var(--text-muted);
+            font-family: var(--font-text);
+            font-size: 14px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 32px;
+            color: var(--text);
+            font-family: var(--font-text);
+            font-size: 13px;
+            text-decoration: none;
+            transition: color 0.35s ease;
+        }
+
+        .back-link::after {
+            content: "";
+            display: block;
+            height: 1px;
+            margin-top: 2px;
+            background: #33d6ad;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.35s ease;
+        }
+
+        @media (hover: hover) {
+            .back-link:hover {
+                color: #a8a8b0;
+            }
+
+            .back-link:hover::after {
+                transform: scaleX(1);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="page">
+        <div class="logo">yevwke</div>
+
+        <h1 class="error-code">404</h1>
+        <p class="error-text">Страница не найдена</p>
+
+        <a class="back-link" href="./">На главную</a>
+    </main>
+</body>
+</html>

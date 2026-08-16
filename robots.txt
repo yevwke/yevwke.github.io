@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://yevwke.github.io/sitemap.xml

@@ -1,7 +1,7 @@
 
 @font-face {
     font-family: "SiteText";
-    src: url("./fonts/Inter-VariableFont_opsz,wght.ttf") format("truetype");
+    src: url("./fonts/Inter-VariableFont_opsz,wght.woff2") format("woff2");
     font-weight: 100 900;
     font-style: normal;
     font-display: swap;
@@ -9,7 +9,7 @@
 
 @font-face {
     font-family: "SiteLogo";
-    src: url("./fonts/Manrope-VariableFont_wght.ttf") format("truetype");
+    src: url("./fonts/Manrope-VariableFont_wght.woff2") format("woff2");
     font-weight: 100 900;
     font-style: normal;
     font-display: swap;
@@ -17,7 +17,7 @@
 
 @font-face {
     font-family: "SiteProjects";
-    src: url("./fonts/Inter-VariableFont_opsz,wght.ttf") format("truetype");
+    src: url("./fonts/Inter-VariableFont_opsz,wght.woff2") format("woff2");
     font-weight: 100 900;
     font-style: normal;
     font-display: swap;
