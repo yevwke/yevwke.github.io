@@ -1,15 +1,43 @@
-
-
-document.addEventListener("DOMContentLoaded", () => {
-    const user = "yev" + "wke";
-    const domain = "gm" + "ail";
-    const email = user + "@" + domain + "." + "com";
-    const emailLink = document.getElementById("email-link");
-    if (emailLink) {
-        emailLink.href = "mailto:" + email;
-    }
-
-    renderProjects();
-    initBackground();
+document.addEventListener("DOMContentLoaded",async ()=>{
+const emailLink=document.getElementById("email-link");
+if(emailLink&&emailLink.dataset.emailUser&&emailLink.dataset.emailDomain){
+emailLink.href=
+"mailto:"+
+emailLink.dataset.emailUser+
+"@"+
+emailLink.dataset.emailDomain;
+}
+if(typeof initBackground==="function"){
+initBackground();
+}
+if(window.Yevwke.sidebarFade){
+window.Yevwke.sidebarFade.init();
+}
+const page=document.body.dataset.page||"home";
+if(page==="project"){
+if(window.Yevwke.galleryLightbox){
+window.Yevwke.galleryLightbox.init();
+}
+if(window.Yevwke.panelGallery&&window.Yevwke.panelGallery.initStatic){
+window.Yevwke.panelGallery.initStatic();
+}
+return;
+}
+try{
+const catalog=await window.Yevwke.data.loadCatalog();
+const container=document.getElementById("projects-groups");
+if(container&&container.dataset.prerendered!=="true"){
+window.Yevwke.projects.render(catalog);
+}
+window.Yevwke.panel.init();
+if(window.Yevwke.galleryLightbox){
+window.Yevwke.galleryLightbox.init();
+}
+}catch(error){
+const container=document.getElementById("projects-groups");
+if(container&&container.dataset.prerendered!=="true"){
+window.Yevwke.projects.renderError("Не удалось загрузить проекты.");
+}
+console.error(error);
+}
 });
-
