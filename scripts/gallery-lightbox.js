@@ -2,13 +2,18 @@
 "use strict";
 const DESKTOP_QUERY="(min-width: 1201px)";
 const CLOSE_ANIMATION_MS=220;
+const WHEEL_COOLDOWN_MS=340;
 const desktopQuery=window.matchMedia(DESKTOP_QUERY);
 let overlay=null;
 let overlayImage=null;
 let closeButton=null;
 let lastFocused=null;
 let closeTimer=null;
+let wheelTimer=null;
 let panelObserver=null;
+let galleryItems=[];
+let currentIndex=-1;
+let wheelLocked=false;
 let initialized=false;
 let isOpen=false;
 function isDesktop(){
@@ -29,6 +34,54 @@ if(!(target instanceof Element)){
 return null;
 }
 return target.closest(".gallery-item[data-type='image']");
+}
+function collectGalleryItems(item){
+const panel=item.closest(".gallery-panel");
+if(!panel){
+return[item];
+}
+return Array.from(
+panel.querySelectorAll(".gallery-item[data-type='image']")
+).filter((candidate)=>{
+return candidate.querySelector("img.gallery-image");
+});
+}
+function getImageSource(item){
+const image=item?item.querySelector("img.gallery-image"):null;
+return image?image.currentSrc||image.src:"";
+}
+function preloadItem(item){
+const source=getImageSource(item);
+if(!source){
+return;
+}
+const image=document.createElement("img");
+image.decoding="async";
+image.src=source;
+}
+function preloadNeighbors(){
+preloadItem(galleryItems[currentIndex-1]);
+preloadItem(galleryItems[currentIndex+1]);
+}
+function showIndex(index){
+const item=galleryItems[index];
+const source=getImageSource(item);
+if(!item||!source){
+return false;
+}
+const thumbnail=item.querySelector("img.gallery-image");
+currentIndex=index;
+overlayImage.src=source;
+overlayImage.alt=thumbnail.alt||"";
+lastFocused=item;
+preloadNeighbors();
+return true;
+}
+function step(direction){
+if(!isOpen||!galleryItems.length){
+return false;
+}
+return showIndex(currentIndex+direction);
 }
 function enhanceImageItem(item){
 if(!item||!item.matches(".gallery-item[data-type='image']")){
@@ -99,6 +152,33 @@ return;
 window.clearTimeout(closeTimer);
 closeTimer=null;
 }
+function clearWheelTimer(){
+if(wheelTimer!==null){
+window.clearTimeout(wheelTimer);
+wheelTimer=null;
+}
+wheelLocked=false;
+}
+function handleWheel(event){
+if(!isOpen){
+return;
+}
+if(event.ctrlKey||event.altKey||event.metaKey){
+return;
+}
+event.preventDefault();
+if(wheelLocked||event.deltaY===0){
+return;
+}
+if(!step(event.deltaY>0?1:-1)){
+return;
+}
+wheelLocked=true;
+wheelTimer=window.setTimeout(()=>{
+wheelLocked=false;
+wheelTimer=null;
+},WHEEL_COOLDOWN_MS);
+}
 function finishClose(focusTarget){
 if(isOpen||!overlay){
 return;
@@ -109,6 +189,8 @@ overlayImage.alt="";
 if(focusTarget&&focusTarget.isConnected){
 focusTarget.focus({preventScroll:true});
 }
+galleryItems=[];
+currentIndex=-1;
 lastFocused=null;
 closeTimer=null;
 }
@@ -122,6 +204,7 @@ isOpen=false;
 overlay.classList.remove("is-open");
 document.body.classList.remove("is-lightbox-open");
 clearCloseTimer();
+clearWheelTimer();
 if(prefersReducedMotion()){
 finishClose(focusTarget);
 return;
@@ -142,10 +225,17 @@ thumbnail.naturalWidth<=0
 ){
 return;
 }
+const items=collectGalleryItems(item);
+const index=items.indexOf(item);
+galleryItems=index===-1?[item]:items;
+currentIndex=index===-1?0:index;
 clearCloseTimer();
-lastFocused=item;
-overlayImage.src=thumbnail.currentSrc||thumbnail.src;
-overlayImage.alt=thumbnail.alt||"";
+clearWheelTimer();
+if(!showIndex(currentIndex)){
+galleryItems=[];
+currentIndex=-1;
+return;
+}
 overlay.hidden=false;
 document.body.classList.add("is-lightbox-open");
 isOpen=true;
@@ -183,6 +273,23 @@ event.preventDefault();
 event.stopImmediatePropagation();
 close();
 return;
+}
+if(!event.altKey&&!event.ctrlKey&&!event.metaKey){
+if(
+event.key==="ArrowRight"||
+event.key==="ArrowDown"
+){
+event.preventDefault();
+event.stopImmediatePropagation();
+step(1);
+return;
+}
+if(event.key==="ArrowLeft"||event.key==="ArrowUp"){
+event.preventDefault();
+event.stopImmediatePropagation();
+step(-1);
+return;
+}
 }
 if(event.key==="Tab"){
 event.preventDefault();
@@ -235,6 +342,7 @@ return;
 }
 initialized=true;
 createOverlay();
+overlay.addEventListener("wheel",handleWheel,{passive:false});
 document.addEventListener("click",handleDocumentClick);
 document.addEventListener("keydown",handleDocumentKeydown,true);
 window.addEventListener("hashchange",handlePanelChange);

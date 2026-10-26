@@ -1,6 +1,9 @@
 (function(){
 "use strict";
 let activeLink=null;
+let homeContent=null;
+let homeBodyClass="";
+let isHomeView=false;
 const PANEL_ANIMATION_MS=420;
 const PANEL_CLOSE_DELAY_MS=PANEL_ANIMATION_MS+40;
 let panelState="closed";
@@ -87,6 +90,40 @@ function resetPanelScroll(panel,body){
 panel.scrollTop=0;
 body.scrollTop=0;
 }
+function captureHomePanel(panel,body){
+if(!panel||!body||!panel.classList.contains("content-panel--home")){
+return;
+}
+homeContent=Array.from(body.children,(child)=>
+child.cloneNode(true)
+);
+homeBodyClass=body.className;
+isHomeView=true;
+panelState="home";
+}
+function restoreHomePanel(panel,body){
+if(!homeContent||!panel||!body){
+return false;
+}
+if(window.Yevwke.panelContent){
+window.Yevwke.panelContent.clear();
+}
+body.className=homeBodyClass;
+body.replaceChildren(
+...homeContent.map((node)=>node.cloneNode(true))
+);
+panel.classList.remove("is-leaving");
+panel.classList.add("content-panel--home","is-open");
+panel.hidden=false;
+panel.removeAttribute("aria-label");
+panelState="home";
+isHomeView=true;
+resetPanelScroll(panel,body);
+if(window.Yevwke.panelGallery&&window.Yevwke.panelGallery.initStatic){
+window.Yevwke.panelGallery.initStatic();
+}
+return true;
+}
 function openPanel(link,options={}){
 const panel=document.getElementById("content-panel");
 const body=document.getElementById("panel-body");
@@ -101,10 +138,11 @@ return false;
 const updateHistory=options.updateHistory!==false;
 const moveFocus=options.moveFocus!==false;
 const wasHidden=panel.hidden;
+const wasHome=isHomeView;
 const reducedMotion=prefersReducedMotion();
 const title=link.querySelector(".project-title");
 clearCloseTimer();
-panel.classList.remove("is-leaving");
+panel.classList.remove("is-leaving","content-panel--home");
 panelState="opening";
 if(activeLink&&activeLink!==link){
 setLinkState(activeLink,false);
@@ -117,6 +155,7 @@ resetPanelScroll(panel,body);
 document.body.classList.add("is-panel-open");
 document.body.classList.add("is-sidebar-dimmed");
 activeLink=link;
+isHomeView=false;
 setLinkState(activeLink,true);
 const currentItems=document.querySelectorAll(".project-item.is-current");
 currentItems.forEach((item)=>{
@@ -127,7 +166,10 @@ if(activeItem){
 activeItem.classList.add("is-current");
 }
 if(updateHistory&&id){
-setPanelUrl(id,wasHidden?"push":"replace");
+setPanelUrl(
+id,
+wasHidden||wasHome?"push":"replace"
+);
 }
 if(wasHidden){
 panel.classList.remove("is-open");
@@ -148,7 +190,7 @@ panelState="open";
 panel.classList.add("is-open");
 panelState="open";
 }
-if(!wasHidden||!moveFocus){
+if(!moveFocus||(!wasHidden&&!wasHome)){
 return true;
 }
 const closeButton=document.getElementById("panel-close");
@@ -162,7 +204,7 @@ return true;
 function closePanel(returnFocus,options={}){
 const panel=document.getElementById("content-panel");
 const body=document.getElementById("panel-body");
-if(!panel||panel.hidden||panelState==="closing"){
+if(!activeLink||!panel||panel.hidden||panelState==="closing"){
 return;
 }
 const updateHistory=options.updateHistory!==false;
@@ -188,6 +230,14 @@ setPanelUrl("","replace");
 }
 const finish=()=>{
 if(panelState!=="closing"){
+return;
+}
+if(homeContent&&restoreHomePanel(panel,body)){
+document.body.classList.remove("is-panel-open");
+if(closingItem){
+closingItem.classList.remove("is-current");
+}
+closeTimer=null;
 return;
 }
 panel.hidden=true;
@@ -303,10 +353,12 @@ link.setAttribute("aria-expanded","false");
 }
 function init(){
 const panel=document.getElementById("content-panel");
+const body=document.getElementById("panel-body");
 const closeButton=document.getElementById("panel-close");
-if(!panel||!closeButton){
+if(!panel||!body||!closeButton){
 return;
 }
+captureHomePanel(panel,body);
 const projectsContainer=document.getElementById("projects-groups");
 if(projectsContainer){
 projectsContainer.addEventListener("click",handleProjectsClick);
@@ -315,7 +367,7 @@ closeButton.addEventListener("click",()=>{
 closePanel(true);
 });
 document.addEventListener("keydown",(event)=>{
-if(event.key==="Escape"&&!panel.hidden){
+if(event.key==="Escape"&&activeLink){
 closePanel(true);
 }
 });

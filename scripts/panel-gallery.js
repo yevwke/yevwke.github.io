@@ -143,7 +143,11 @@ revealItem(item);
 }
 function getRevealRoot(){
 if(window.matchMedia(PANEL_SCROLL_QUERY).matches){
-return document.getElementById("content-panel");
+const panel=document.getElementById("content-panel");
+if(panel&&panel.classList.contains("content-panel--home")){
+return null;
+}
+return panel;
 }
 return state?state.body:null;
 }
@@ -512,6 +516,9 @@ const type=item.dataset.type||"image";
 if(type!=="image"){
 markReady(item);
 return;
+}
+if(window.Yevwke.galleryLightbox){
+window.Yevwke.galleryLightbox.enhanceImageItem(item);
 }
 const image=item.querySelector("img.gallery-image");
 if(!image){

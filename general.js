@@ -10,16 +10,14 @@ emailLink.dataset.emailDomain;
 if(typeof initBackground==="function"){
 initBackground();
 }
-if(window.Yevwke.sidebarFade){
-window.Yevwke.sidebarFade.init();
-}
 const page=document.body.dataset.page||"home";
 if(page==="project"){
-if(window.Yevwke.galleryLightbox){
-window.Yevwke.galleryLightbox.init();
+const yevwke=window.Yevwke||{};
+if(yevwke.galleryLightbox){
+yevwke.galleryLightbox.init();
 }
-if(window.Yevwke.panelGallery&&window.Yevwke.panelGallery.initStatic){
-window.Yevwke.panelGallery.initStatic();
+if(yevwke.panelGallery&&yevwke.panelGallery.initStatic){
+yevwke.panelGallery.initStatic();
 }
 return;
 }
@@ -30,6 +28,9 @@ if(container&&container.dataset.prerendered!=="true"){
 window.Yevwke.projects.render(catalog);
 }
 window.Yevwke.panel.init();
+if(window.Yevwke.panelGallery&&window.Yevwke.panelGallery.initStatic){
+window.Yevwke.panelGallery.initStatic();
+}
 if(window.Yevwke.galleryLightbox){
 window.Yevwke.galleryLightbox.init();
 }
